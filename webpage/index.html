@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Response Test</title>
+</head>
+<body>
+    <textarea id="input" rows="10" cols="50"></textarea> <!-- Input textarea for JSON -->
+    <button onclick="sendData()">Submit</button> <!-- Button to send JSON data -->
+
+    <textarea id="output" rows="10" cols="50"></textarea>
+
+    <script>
+        const outputElement = document.getElementById('output');
+        const inputElement = document.getElementById('input');
+
+        const eventSource = new EventSource('http://localhost:5000/stream');
+
+        eventSource.onmessage = (event) => {
+            outputElement.value += event.data; // Changed from innerText to value
+            console.log(event.data)
+        };
+
+        eventSource.onerror = (error) => {
+            console.error('EventSource failed:', error);
+            eventSource.close();
+        };
+
+        function sendData() {
+            const jsonData = {"text": inputElement.value};
+            fetch('http://localhost:5000/summarize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData),
+            });
+        }
+    </script>
+</body>
+</html>
