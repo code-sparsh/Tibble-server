@@ -67,10 +67,13 @@ prompt = PromptTemplate(template=template, input_variables=["text"])
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
 def get_llm_response(text):
+    start = time.time()
+
     result = llm_chain.run(text)
+
+    end = time.time()
+    print(f"\n> Response (took {round(end - start, 2)} s.): ")
     print(result)
-
-
 
 
 @app.route('/', methods=['GET'])
@@ -95,74 +98,22 @@ def main():
 
     print("API hit")
 
-    # loader = TextLoader("source_documents/albert.txt")
-    # loadedText = loader.load()
-
     user_input = None
 
     if request.method == 'POST':
         user_input = request.json
 
-    # if user_input is None:
-    #     return
+    if user_input is None:
+        return
     
-
     text = ""
     result = ""
 
     if request.method == 'POST':
          text = user_input.get('text')
 
-
-# Callbacks support token-wise streaming
-    
-    tempText = """Dubbing is a post-production process of re-recording actors’ dialogues, which
-is extensively used in filmmaking and video production. It is usually performed
-manually by professional voice actors who read lines with proper prosody, and in
-synchronization with the pre-recorded videos. In this work, we propose Neural
-Dubber, the first neural network model to solve a novel automatic video dubbing
-(AVD) task: synthesizing human speech synchronized with the given video from the
-text
-"""
-
-
     # run the inference
     Thread(target=get_llm_response, args=(text,)).start()
-
-    # def generate():
-    #     while True:
-    #         global token_to_send
-    #         if token_to_send != "":
-    #             yield f'data: {token_to_send}\n\n'
-    #             token_to_send = ""
-    #             print("hello")
-
-    # def generate():
-    #     while True:
-    #         yield f'data: {1}\n\n'
-    
-
-    
-
-
-# start = time.time()
-# chain = load_summarize_chain(llm=llm, chain_type="stuff")
-# chain.run(loadedText, callbacks=callbacks)
-# end = time.time()
-
-# print(f"\n> Answer (took {round(end - start, 2)} s.):")
-
-# prompt = """
-# Question: "What is the largest country on Earth?   
-# """
-
-# response = llm(prompt)
-
-    response_data = {
-        "result": "Loading..."
-    }
-    return response_data
-
 
 if __name__ == '__main__':
     app.run(debug=False)
